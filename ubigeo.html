@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selección de Departamentos y Provincias</title>
+</head>
+<body>
+  <h1>Selección de Departamentos y Provincias</h1>
+  
+  <label for="departamentos">Selecciona un departamento:</label>
+  <select id="departamentos" name="departamentos">
+    <!-- Aquí se cargarán dinámicamente los departamentos desde la API -->
+  </select>
+  
+  <br><br>
+  
+  <label for="provincias">Selecciona una provincia:</label>
+  <select id="provincias" name="provincias">
+    <!-- Aquí se cargarán dinámicamente las provincias según el departamento seleccionado -->
+  </select>
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // Obtener la lista de departamentos al cargar la página
+      $.get('/api/departamentos', function(data) {
+        var selectDepartamentos = $('#departamentos');
+        data.departamentos.forEach(function(departamento) {
+          selectDepartamentos.append($('<option>').text(departamento.departamento).attr('value', departamento.idDepartamento));
+        });
+      });
+
+      // Manejar la selección de departamentos para cargar las provincias correspondientes
+      $('#departamentos').change(function() {
+        var idDepartamento = $(this).val();
+        console.log(idDepartamento);
+        $.get('/api/provincias/' + idDepartamento, function(data) {
+          var selectProvincias = $('#provincias');
+          selectProvincias.empty();
+          data.provincias.forEach(function(provincia) {
+            selectProvincias.append($('<option>').text(provincia.provincia).attr('value', provincia.idProvincia));
+          });
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+
+
+
