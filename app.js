@@ -1,10 +1,10 @@
 const express = require('express');
-//const mysql = require('mysql');
+const mysql = require('mysql2');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const mysql = require('mysql2');
+// Conexion con la base de Datos en la nube
 
 const db = mysql.createConnection({
   host: 'roundhouse.proxy.rlwy.net',
@@ -13,7 +13,7 @@ const db = mysql.createConnection({
   database: 'railway',
   port: 44028,
   authPlugins: {
-    mysql_clear_password: () => () => Buffer.from('EglUDrutrCVjfQTwJMjkOCwbOWFTbHDw') // Esto es necesario para ciertas versiones de MySQL
+    mysql_clear_password: () => () => Buffer.from('EglUDrutrCVjfQTwJMjkOCwbOWFTbHDw') 
   }
 });
 
@@ -25,6 +25,8 @@ db.connect((err) => {
   }
 });
 
+
+// Get para departamentos
 app.get('/api/departamentos', (req, res) => {
   const sql = 'SELECT * FROM departamentos';
 
@@ -38,6 +40,7 @@ app.get('/api/departamentos', (req, res) => {
   });
 });
 
+// Get para provincias  
 app.get('/api/provincias/:idDepartamento', (req, res) => {
   const idDepartamento = req.params.idDepartamento;
   const sql = 'SELECT * FROM provincia WHERE idDepartamento = ?';
@@ -51,6 +54,7 @@ app.get('/api/provincias/:idDepartamento', (req, res) => {
   });
 });
 
+//  HTML de prueba
 app.get('/ubigeo', (req, res) => {
   res.sendFile(__dirname + '/ubigeo.html');
 });
