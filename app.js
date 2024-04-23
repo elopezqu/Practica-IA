@@ -7,13 +7,13 @@ const PORT = process.env.PORT || 3000;
 const mysql = require('mysql2');
 
 const db = mysql.createConnection({
-  host: 'monorail.proxy.rlwy.net',
+  host: 'roundhouse.proxy.rlwy.net',
   user: 'root',
-  password: 'wZdCgiZUjdXBNnHAaCfidVupoqKsntxk',
+  password: 'EglUDrutrCVjfQTwJMjkOCwbOWFTbHDw',
   database: 'railway',
-  port: 10825,
+  port: 44028,
   authPlugins: {
-    mysql_clear_password: () => () => Buffer.from('wZdCgiZUjdXBNnHAaCfidVupoqKsntxk') // Esto es necesario para ciertas versiones de MySQL
+    mysql_clear_password: () => () => Buffer.from('EglUDrutrCVjfQTwJMjkOCwbOWFTbHDw') // Esto es necesario para ciertas versiones de MySQL
   }
 });
 
