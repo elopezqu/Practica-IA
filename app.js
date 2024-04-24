@@ -1,7 +1,9 @@
 const express = require('express');
 const mysql = require('mysql2');
 
+
 const app = express();
+app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 // Conexion con la base de Datos en la nube
@@ -26,11 +28,24 @@ db.connect((err) => {
 });
 
 
-// Get para departamentos
-app.get('/api/departamentos', (req, res) => {
-  const sql = 'SELECT * FROM departamentos';
-
+// Get para Pais
+app.get('/api/paises', (req, res) => {
+  const sql = 'SELECT * FROM pais';
   db.query(sql, (err, result) => {
+    if (err) {
+      console.error('Error al obtener los países:', err);
+      res.status(500).json({ error: 'Error al obtener los países' });
+    } else {
+      res.json({ paises: result });
+    }
+  });
+});
+
+// Get para departamentos
+app.get('/api/departamentos/:idPais', (req, res) => {
+  const idPais = req.params.idPais;
+  const sql = 'SELECT * FROM departamentos WHERE idPais = ?';
+  db.query(sql, [idPais], (err, result) => {
     if (err) {
       console.error('Error al obtener los departamentos:', err);
       res.status(500).json({ error: 'Error al obtener los departamentos' });
@@ -39,7 +54,6 @@ app.get('/api/departamentos', (req, res) => {
     }
   });
 });
-
 // Get para provincias  
 app.get('/api/provincias/:idDepartamento', (req, res) => {
   const idDepartamento = req.params.idDepartamento;
@@ -53,6 +67,100 @@ app.get('/api/provincias/:idDepartamento', (req, res) => {
     }
   });
 });
+
+// Get para distritos
+app.get('/api/distritos/:idProvincia', (req, res) => {
+  const idProvincia = req.params.idProvincia;
+  const sql = 'SELECT * FROM distrito WHERE idProvincia = ?';
+  db.query(sql, [idProvincia], (err, result) => {
+    if (err) {
+      console.error('Error al obtener los distritos:', err);
+      res.status(500).json({ error: 'Error al obtener los distritos' });
+    } else {
+      res.json({ distritos: result });
+    }
+  });
+});
+
+// Post para pais
+app.post('/api/paises', (req, res) => {
+  const { pais, nacionalidad } = req.body; // Se espera que los datos del país se envíen en el cuerpo de la solicitud en formato JSON
+  console.log(pais, nacionalidad);
+  // Verificar si se proporcionan todos los campos necesarios
+  if (!pais || !nacionalidad) {
+    return res.status(400).json({ error: 'Se requiere el nombre del país y la nacionalidad para crear un país.' });
+  }
+
+  const sql = 'INSERT INTO pais (pais, nacionalidad) VALUES (?, ?)';
+  console.log(sql);
+  db.query(sql, [pais, nacionalidad], (err, result) => {
+    if (err) {
+      console.error('Error al crear el país:', err);
+      res.status(500).json({ error: 'Error al crear el país' });
+    } else {
+      res.status(201).json({ message: 'País creado correctamente', id: result.insertId });
+    }
+  });
+});
+
+// Post para departamentos
+app.post('/api/departamentos', (req, res) => {
+  const { departamento , idPais } = req.body;
+
+  if (!departamento || !idPais) {
+    return res.status(400).json({ error: 'Se requiere el nombre del departamento para crearlo.' });
+  }
+
+  const sql = 'INSERT INTO departamentos (departamento, idPais) VALUES (?, ?)';
+  db.query(sql, [departamento , idPais], (err, result) => {
+    if (err) {
+      console.error('Error al crear el departamento:', err);
+      res.status(500).json({ error: 'Error al crear el departamento' });
+    } else {
+      res.status(201).json({ message: 'Departamento creado correctamente', id: result.insertId });
+    }
+  });
+});
+
+// Post para provincias
+app.post('/api/provincias', (req, res) => {
+  const { provincia, idDepartamento } = req.body;
+
+  if (!provincia || !idDepartamento) {
+    return res.status(400).json({ error: 'Se requiere el nombre de la provincia y el ID del departamento para crearla.' });
+  }
+
+  const sql = 'INSERT INTO provincia (provincia, idDepartamento) VALUES (?, ?)';
+  db.query(sql, [provincia, idDepartamento], (err, result) => {
+    if (err) {
+      console.error('Error al crear la provincia:', err);
+      res.status(500).json({ error: 'Error al crear la provincia' });
+    } else {
+      res.status(201).json({ message: 'Provincia creada correctamente', id: result.insertId });
+    }
+  });
+});
+
+// Post para  distritos
+app.post('/api/distritos', (req, res) => {
+  const { distrito, idProvincia } = req.body;
+
+  if (!distrito || !idProvincia) {
+    return res.status(400).json({ error: 'Se requiere el nombre del distrito y el ID de la provincia para crearlo.' });
+  }
+
+  const sql = 'INSERT INTO distrito (distrito, idProvincia) VALUES (?, ?)';
+  db.query(sql, [distrito, idProvincia], (err, result) => {
+    if (err) {
+      console.error('Error al crear el distrito:', err);
+      res.status(500).json({ error: 'Error al crear el distrito' });
+    } else {
+      res.status(201).json({ message: 'Distrito creado correctamente', id: result.insertId });
+    }
+  });
+});
+
+
 
 //  HTML de prueba
 app.get('/ubigeo', (req, res) => {

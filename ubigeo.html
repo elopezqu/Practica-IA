@@ -8,11 +8,18 @@
 <body>
   <h1>Selección de Departamentos y Provincias</h1>
   
-  <label for="departamentos">Selecciona un departamento:</label>
-  <select id="departamentos" name="departamentos">
+  <label for="paises">Selecciona un Pais:</label>
+  <select id="paises" name="paises">
     <!-- Aquí se cargarán dinámicamente los departamentos desde la API -->
   </select>
   
+  <br><br>
+  
+  <label for="departamentos">Selecciona un departamentos:</label>
+  <select id="departamentos" name="departamentos">
+    <!-- Aquí se cargarán dinámicamente las provincias según el departamento seleccionado -->
+  </select>
+
   <br><br>
   
   <label for="provincias">Selecciona una provincia:</label>
@@ -23,15 +30,41 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     $(document).ready(function() {
-      // Obtener la lista de departamentos al cargar la página
-      $.get('/api/departamentos', function(data) {
+      // Obtener la lista de paises al cargar la página
+      $.get('/api/paises', function(data) {
+        var selectPaises = $('#paises');
+        data.paises.forEach(function(paises) {
+          selectPaises.append($('<option>').text(paises.pais).attr('value', paises.idPais));
+        });
+      });
+
+      var idPais = $('#paises').val();
+      console.log(idPais);
+      if (!idPais) {
+        idPais = 1; // Si idPais no tiene valor, se establece en 1 por defecto
+      }
+      console.log(idPais);
+      $.get('/api/departamentos/' + idPais, function (data) {
         var selectDepartamentos = $('#departamentos');
-        data.departamentos.forEach(function(departamento) {
+        selectDepartamentos.empty();
+        console.log(data);
+        data.departamentos.forEach(function (departamento) {
           selectDepartamentos.append($('<option>').text(departamento.departamento).attr('value', departamento.idDepartamento));
         });
       });
 
       // Manejar la selección de departamentos para cargar las provincias correspondientes
+      $('#paises').change(function () {
+        var idPais = $(this).val();
+        console.log(idPais);
+        $.get('/api/departamentos/' + idPais, function (data) {
+          var selectDepartamentos = $('#departamentos');
+          selectDepartamentos.empty();
+          data.departamentos.forEach(function (departamentos) {
+            selectDepartamentos.append($('<option>').text(departamentos.departamento).attr('value', departamentos.idDepartamentos));
+          });
+        });
+      });
       $('#departamentos').change(function() {
         var idDepartamento = $(this).val();
         console.log(idDepartamento);
@@ -43,10 +76,12 @@
           });
         });
       });
+      $('#provincias').change(function() {
+        var idProvincia = $(this).val();
+        console.log(idProvincia);
+      });
     });
-  </script>
-</body>
-</html>
-
-
-
+      </script>
+  </body>
+  
+  </html>
