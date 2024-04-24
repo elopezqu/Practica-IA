@@ -82,6 +82,37 @@ app.get('/api/distritos/:provincia', (req, res) => {
   });
 });
 
+//Get para ubigeo
+app.get('/api/ubigeo/:departamento/:provincia?/:distrito?', (req, res) => {
+  const departamento = req.params.departamento;
+  let provincia = req.params.provincia || '';
+  let distrito = req.params.distrito || '';
+  
+  let sql = 'SELECT * FROM ubigeo u WHERE u.dpto = ?';
+  let params = [departamento];
+
+  // Agregar provincia a la consulta y parámetros si está presente
+  if (provincia !== '') {
+    sql += ' AND u.prov = ?';
+    params.push(provincia);
+  }
+
+  // Agregar distrito a la consulta y parámetros si está presente
+  if (distrito !== '') {
+    sql += ' AND u.distrito = ?';
+    params.push(distrito);
+  }
+
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      console.error('Error al obtener ubigeo: ', err);
+      res.status(500).json({ error: "error al obtener ubigeo" });
+    } else {
+      res.json({ ubigeos: result });
+    }
+  });
+});
+
 // Post para pais
 app.post('/api/paises', (req, res) => {
   const { pais, nacionalidad } = req.body; // Se espera que los datos del país se envíen en el cuerpo de la solicitud en formato JSON

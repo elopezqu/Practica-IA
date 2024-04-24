@@ -34,6 +34,16 @@
     <!-- Aquí se cargarán dinámicamente las provincias según el departamento seleccionado -->
   </select>
   
+  <br><br>
+
+  <button style="display: none;" onclick="getUbigeo()" id="ubigeo" name="ubigeo"> Buscar Ubigeo</button>
+
+  <hr>
+
+  <table id="tablaUbigeos" border="1">
+  </table>
+
+
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     $(document).ready(function() {
@@ -81,15 +91,21 @@
       });
       $('#departamentos').change(function() {
         var departamento = $(this).val();
+        if(departamento == '') $('#ubigeo').hide();
         console.log(departamento);
         $('#distritos').empty(); // Limpiar la lista de distritos al cambiar el país
         $.get('/api/provincias/' + departamento, function(data) {
           var selectProvincias = $('#provincias');
           selectProvincias.empty().append($('<option>').text('Selecciona un provincia').attr('value', ''));
+          
+          var selectDistritos = $('#distritos');
+          selectDistritos.empty().append($('<option>').text('Selecciona un Distrito').attr('value', ''));
+          
           data.provincias.forEach(function(provincia) {
             selectProvincias.append($('<option>').text(provincia.provincia).attr('value', provincia.provincia));
           });
         });
+        $('#ubigeo').show();
       });
       $('#provincias').change(function() {
         var provincia = $(this).val();
@@ -98,10 +114,45 @@
           var selectDistritos = $('#distritos');
           selectDistritos.empty().append($('<option>').text('Selecciona un Distrito').attr('value', ''));
           data.distritos.forEach(function(distrito) {
-            selectDistritos.append($('<option>').text(distrito.distrito).attr('value', distrito.idDistrito));
+            selectDistritos.append($('<option>').text(distrito.distrito).attr('value', distrito.distrito));
           });
         });
       });
+
+      function getUbigeo(){
+        var selectDepartamentos = $('#departamentos');
+        var selectProvincias = $('#provincias');
+        var selectDistritos = $('#distritos');
+        var q = selectDepartamentos.val();
+        if(selectProvincias.val() != ''){  
+          q += '/'+selectProvincias.val(); 
+        }
+        if(selectDistritos.val() != ''){  
+          q += '/'+selectDistritos.val(); 
+        }
+        console.log(q);
+        $.get('/api/ubigeo/' + q, function(data) {
+          var tablaDistritos = $('#tablaUbigeos');
+          tablaDistritos.empty(); // Limpiar la tabla antes de agregar nuevos datos
+          var header = $('<tr>');
+          header.append($('<th>').text("DEPARTAMENTO"));
+          header.append($('<th>').text("PROVINCIA"));
+          header.append($('<th>').text("DISTRITO"));
+          header.append($('<th>').text("UBIGEO"));
+          tablaDistritos.append(header);
+
+          data.ubigeos.forEach(function(ubigeo) {
+              // Crear una nueva fila de tabla para cada ubigeo
+              var fila = $('<tr>');
+              fila.append($('<td>').text(ubigeo.dpto));
+              fila.append($('<td>').text(ubigeo.prov));
+              fila.append($('<td>').text(ubigeo.distrito));
+              fila.append($('<td>').text(ubigeo.ubigeo2));
+              // Agregar la fila a la tabla
+              tablaDistritos.append(fila);
+          });
+        });
+      }
       </script>
   </body>
   
