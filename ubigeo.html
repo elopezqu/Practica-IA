@@ -38,8 +38,9 @@
   <script>
     $(document).ready(function() {
       // Obtener la lista de paises al cargar la página
-      $.get('/api/paises', function(data) {
-        var selectPaises = $('#paises');
+      var selectPaises = $('#paises');
+      selectPaises.empty().append($('<option>').text('Selecciona un país').attr('value', ''));
+      $.get('/api/paises', function(data) {  
         data.paises.forEach(function(paises) {
           selectPaises.append($('<option>').text(paises.pais).attr('value', paises.idPais));
         });
@@ -63,41 +64,44 @@
       */
       
       // Manejar la selección de departamentos para cargar las provincias correspondientes
-      $('#paises').change(function () {
+      
+    });
+    $('#paises').change(function () {
         var idPais = $(this).val();
         console.log(idPais);
+        $('#provincias').empty(); // Limpiar la lista de provincias al cambiar el país
+        $('#distritos').empty(); // Limpiar la lista de distritos al cambiar el país
         $.get('/api/departamentos/' + idPais, function (data) {
           var selectDepartamentos = $('#departamentos');
-          selectDepartamentos.empty();
+          selectDepartamentos.empty().append($('<option>').text('Selecciona un departamento').attr('value', ''));
           data.departamentos.forEach(function (departamentos) {
-            selectDepartamentos.append($('<option>').text(departamentos.departamento).attr('value', departamentos.idDepartamentos));
+            selectDepartamentos.append($('<option>').text(departamentos.departamento).attr('value', departamentos.departamentos));
           });
         });
       });
-
       $('#departamentos').change(function() {
-        var idDepartamento = $(this).val();
-        console.log(idDepartamento);
-        $.get('/api/provincias/' + idDepartamento, function(data) {
+        var departamento = $(this).val();
+        console.log(departamento);
+        $('#distritos').empty(); // Limpiar la lista de distritos al cambiar el país
+        $.get('/api/provincias/' + departamento, function(data) {
           var selectProvincias = $('#provincias');
-          selectProvincias.empty();
+          selectProvincias.empty().append($('<option>').text('Selecciona un provincia').attr('value', ''));
           data.provincias.forEach(function(provincia) {
-            selectProvincias.append($('<option>').text(provincia.provincia).attr('value', provincia.idProvincia));
+            selectProvincias.append($('<option>').text(provincia.provincia).attr('value', provincia.provincia));
           });
         });
       });
       $('#provincias').change(function() {
-        var idProvincias = $(this).val();
-        console.log(idProvincias);
-        $.get('/api/distritos/' + idProvincias, function(data) {
+        var provincia = $(this).val();
+        console.log(provincia);
+        $.get('/api/distritos/' + provincia, function(data) {
           var selectDistritos = $('#distritos');
-          selectDistritos.empty();
+          selectDistritos.empty().append($('<option>').text('Selecciona un Distrito').attr('value', ''));
           data.distritos.forEach(function(distrito) {
             selectDistritos.append($('<option>').text(distrito.distrito).attr('value', distrito.idDistrito));
           });
         });
       });
-    });
       </script>
   </body>
   

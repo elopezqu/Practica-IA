@@ -55,10 +55,10 @@ app.get('/api/departamentos/:idPais', (req, res) => {
   });
 });
 // Get para provincias  
-app.get('/api/provincias/:idDepartamento', (req, res) => {
-  const idDepartamento = req.params.idDepartamento;
-  const sql = 'SELECT * FROM provincia WHERE idDepartamento = ?';
-  db.query(sql, [idDepartamento], (err, result) => {
+app.get('/api/provincias/:departamento', (req, res) => {
+  const departamento = req.params.departamento;
+  const sql = 'SELECT p.* FROM provincia p INNER JOIN departamentos d ON p.idDepartamento = d.idDepartamento WHERE d.departamento = ?';
+  db.query(sql, [departamento], (err, result) => {
     if (err) {
       console.error('Error al obtener las provincias:', err);
       res.status(500).json({ error: 'Error al obtener las provincias' });
@@ -69,10 +69,10 @@ app.get('/api/provincias/:idDepartamento', (req, res) => {
 });
 
 // Get para distritos
-app.get('/api/distritos/:idProvincia', (req, res) => {
-  const idProvincia = req.params.idProvincia;
-  const sql = 'SELECT * FROM distrito WHERE idProvincia = ?';
-  db.query(sql, [idProvincia], (err, result) => {
+app.get('/api/distritos/:provincia', (req, res) => {
+  const provincia = req.params.provincia;
+  const sql = 'SELECT p.* FROM distrito p INNER JOIN provincia d ON p.idProvincia = d.idProvincia WHERE d.provincia = ?';
+  db.query(sql, [provincia], (err, result) => {
     if (err) {
       console.error('Error al obtener los distritos:', err);
       res.status(500).json({ error: 'Error al obtener los distritos' });
@@ -119,11 +119,7 @@ app.post('/api/departamentos', (req, res) => {
     } else {
       res.status(201).json({ message: 'Departamento creado correctamente', id: result.insertId });
     }
-  });
-});
-
 // Post para provincias
-app.post('/api/provincias', (req, res) => {
   const { provincia, idDepartamento } = req.body;
 
   if (!provincia || !idDepartamento) {
@@ -141,6 +137,8 @@ app.post('/api/provincias', (req, res) => {
   });
 });
 
+
+  });
 // Post para  distritos
 app.post('/api/distritos', (req, res) => {
   const { distrito, idProvincia } = req.body;
@@ -149,7 +147,7 @@ app.post('/api/distritos', (req, res) => {
     return res.status(400).json({ error: 'Se requiere el nombre del distrito y el ID de la provincia para crearlo.' });
   }
 
-  const sql = 'INSERT INTO distrito (distrito, idProvincia) VALUES (?, ?)';
+  const sql = 'INSERT INTO distrito (distrito, id_provincia) VALUES (?, ?)';
   db.query(sql, [distrito, idProvincia], (err, result) => {
     if (err) {
       console.error('Error al crear el distrito:', err);
@@ -159,6 +157,8 @@ app.post('/api/distritos', (req, res) => {
     }
   });
 });
+
+
 
 
 
