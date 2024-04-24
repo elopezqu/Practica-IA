@@ -26,6 +26,13 @@
   <select id="provincias" name="provincias">
     <!-- Aquí se cargarán dinámicamente las provincias según el departamento seleccionado -->
   </select>
+
+  <br><br>
+  
+  <label for="distritos">Selecciona una distrito:</label>
+  <select id="distritos" name="distritos">
+    <!-- Aquí se cargarán dinámicamente las provincias según el departamento seleccionado -->
+  </select>
   
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
@@ -37,7 +44,7 @@
           selectPaises.append($('<option>').text(paises.pais).attr('value', paises.idPais));
         });
       });
-
+      /*
       var idPais = $('#paises').val();
       console.log(idPais);
       if (!idPais) {
@@ -53,6 +60,8 @@
         });
       });
 
+      */
+      
       // Manejar la selección de departamentos para cargar las provincias correspondientes
       $('#paises').change(function () {
         var idPais = $(this).val();
@@ -65,6 +74,7 @@
           });
         });
       });
+
       $('#departamentos').change(function() {
         var idDepartamento = $(this).val();
         console.log(idDepartamento);
@@ -77,8 +87,15 @@
         });
       });
       $('#provincias').change(function() {
-        var idProvincia = $(this).val();
-        console.log(idProvincia);
+        var idProvincias = $(this).val();
+        console.log(idProvincias);
+        $.get('/api/distritos/' + idProvincias, function(data) {
+          var selectDistritos = $('#distritos');
+          selectDistritos.empty();
+          data.distritos.forEach(function(distrito) {
+            selectDistritos.append($('<option>').text(distrito.distrito).attr('value', distrito.idDistrito));
+          });
+        });
       });
     });
       </script>
