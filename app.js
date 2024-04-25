@@ -1,7 +1,6 @@
 const express = require('express');
 const mysql = require('mysql2');
 
-
 const app = express();
 app.use(express.json());
 const PORT = process.env.PORT || 3000;
@@ -26,7 +25,6 @@ db.connect((err) => {
     console.log('Conexión exitosa a la base de datos MySQL');
   }
 });
-
 
 // Get para Pais
 app.get('/api/paises', (req, res) => {
