@@ -17,7 +17,7 @@ const db = mysql.createConnection({
     mysql_clear_password: () => () => Buffer.from('EglUDrutrCVjfQTwJMjkOCwbOWFTbHDw') 
   }
 });
-
+// Error handler para la base de datos
 db.connect((err) => {
   if (err) {
     console.error('Error al conectar a la base de datos:', err);
